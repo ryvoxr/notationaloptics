@@ -20,5 +20,5 @@ typedef struct v2_s  { f32 x, y; } v2;
 typedef struct v2i_s { i32 x, y; } v2i;
 
 void drawpixel(u32 *pixels, v2i p, u32 color);
-void drawline(u32 *pixels, v2i p0, v2i p1, u32 color);
+void drawline(u32 *pixels, v2i p1, v2i p2, u32 color);
 
