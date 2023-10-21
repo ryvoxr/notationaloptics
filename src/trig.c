@@ -17,15 +17,15 @@ double radtodeg(double rad) {
 }
 
 double degsin(double deg) {
-    return degnormalize(sin(degtorad(deg)));
+    return sin(degtorad(deg));
 }
 
 double degcos(double deg) {
-    return degnormalize(cos(degtorad(deg)));
+    return cos(degtorad(deg));
 }
 
 double degtan(double deg) {
-    return degnormalize(tan(degtorad(deg)));
+    return tan(degtorad(deg));
 }
 
 double degatan2(double y, double x) {

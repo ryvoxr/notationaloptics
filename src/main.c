@@ -41,23 +41,37 @@ int main() {
     ASSERT(state.texture,
             "Could not create texture: %s\n", SDL_GetError());
 
-    memset(state.pixels, 0x00, SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned int));
-    v2i p1 = { 0, SCREENHEIGHT/2 };
-    v2i p2 = { SCREENWIDTH, p1.y };
-    drawline(state.pixels, p1, p2, GRAY);
-    fillarc(state.pixels, (v2i){SCREENWIDTH/2, SCREENHEIGHT/2}, 200, 12, 289, WHITE);
+    Component convexlens = {
+        .type = CONVEX_LENS,
+        .pos = SCREENWIDTH/2,
+        .size = 100,
+        .angle = 20,
+    };
 
-    SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
+    Component concavelens = {
+        .type = CONCAVE_LENS,
+        .pos = SCREENWIDTH/2 + 200,
+        .size = 100,
+        .angle = 10,
+    };
 
-    SDL_RenderClear(state.renderer);
-    SDL_RenderCopy(state.renderer, state.texture, NULL, NULL);
-    SDL_RenderPresent(state.renderer);
-
+    int i = 0;
     while (1) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) return 0;
         }
+        clearscreen(state.pixels, BLACK);
+        drawline(state.pixels, (v2i){0, SCREENHEIGHT/2}, (v2i){SCREENWIDTH, SCREENHEIGHT/2}, GRAY);
+        drawcomponent(state.pixels, convexlens, WHITE);
+        drawcomponent(state.pixels, concavelens, WHITE);
+        SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
+
+        SDL_RenderClear(state.renderer);
+        SDL_RenderCopy(state.renderer, state.texture, NULL, NULL);
+        SDL_RenderPresent(state.renderer);
+        i++;
+        SDL_Delay(4);
     }
 }
 

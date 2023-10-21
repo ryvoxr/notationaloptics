@@ -8,8 +8,21 @@ void drawlinelowthick(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
 void drawlinehighthick(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
 v2i shifttooctant(v2i p, v2i offset, int octant);
 
-void drawpixel(unsigned int *pixels, v2i p, unsigned int color) {
+/* drawpixelraw: assumes p is in bounds */
+void drawpixelraw(unsigned int *pixels, v2i p, unsigned int color) {
     pixels[(p.y * SCREENWIDTH) + p.x] = color;
+}
+
+/* drawpixel: returns 0 on success, -1 on failure */
+int drawpixel(unsigned int *pixels, v2i p, unsigned int color) {
+    if (p.x < 0 || p.x >= SCREENWIDTH || p.y < 0 || p.y >= SCREENHEIGHT)
+        return -1;
+    drawpixelraw(pixels, p, color);
+    return 0;
+}
+
+void clearscreen(unsigned int *pixels, unsigned int color) {
+    memset(pixels, color, SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned int));
 }
 
 void drawline(unsigned int *pixels, v2i p0, v2i p1, unsigned int color) {
@@ -198,6 +211,7 @@ void drawcircle(unsigned int *pixels, v2i p, int r, unsigned int color) {
 
 /* shifttooctant: returns p with offset shifted to octant */
 v2i shifttooctant(v2i p, v2i offest, int octant) {
+    octant %= 8;
     switch (octant) {
         case 0: return (v2i){p.x + offest.x, p.y + offest.y};
         case 1: return (v2i){p.x + offest.y, p.y + offest.x};
@@ -218,35 +232,47 @@ void drawarc(unsigned int *pixels, v2i p, int r, double start, double end, unsig
     int dy = 1;
     int err = dx - (r << 1);
 
-    if (end - start >= 360) {
-        fillcircle(pixels, p, r, color);
-        return;
-    }
 
     /* normalize angles: [0,360) */
     start = degnormalize(start);
     end = degnormalize(end);
-    if (start > end) {
-        double temp = start;
-        start = end;
-        end = temp;
+
+    /* don't bother if full circle */
+    if (end - start >= 360) {
+        drawcircle(pixels, p, r, color);
+        return;
     }
 
     int startoctant = (int)start / 45;
     int endoctant = (int)end / 45;
+    if (startoctant >= endoctant)
+        endoctant += 8;
 
     while (x >= y) {
         /* draw full octants */
-        for (int i = startoctant + 1; i < endoctant; i++)
+        int i = startoctant;
+        fmod(start, 45) ? i++ : i;
+        for (; i < endoctant; i++)
             drawpixel(pixels, shifttooctant(p, (v2i){x, y}, i), color);
 
+
         /* draw partial octants */
         v2i sp = shifttooctant(p, (v2i){x, y}, startoctant);
-        if (x < (r * degcos(fmod(start, 45))))
-            drawpixel(pixels, sp, color);
+        if (startoctant % 8 > 3) {
+            if (sp.x > (p.x + (double)r * degcos(start)))
+                drawpixel(pixels, sp, color);
+        } else {
+            if (sp.x < (p.x + (double)r * degcos(start)))
+                drawpixel(pixels, sp, color);
+        }
         v2i ep = shifttooctant(p, (v2i){x, y}, endoctant);
-        if (x > (r * degcos(fmod(end, 45))))
-            drawpixel(pixels, ep, color);
+        if (endoctant % 8 > 3) {
+            if (ep.x < (p.x + (double)r * degcos(end)))
+                drawpixel(pixels, ep, color);
+        } else {
+            if (ep.x > (p.x + (double)r * degcos(end)))
+                drawpixel(pixels, ep, color);
+        }
 
         if (err <= 0) {
             y++;
@@ -262,55 +288,3 @@ void drawarc(unsigned int *pixels, v2i p, int r, double start, double end, unsig
     }
 }
 
-void fillarc(unsigned int *pixels, v2i p, int r, double start, double end, unsigned int color) {
-    int x = r - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (r << 1);
-
-    if (end - start >= 360) {
-        fillcircle(pixels, p, r, color);
-        return;
-    }
-
-    /* normalize angles: [0,360) */
-    start = degnormalize(start);
-    end = degnormalize(end);
-    if (start > end) {
-        double temp = start;
-        start = end;
-        end = temp;
-    }
-
-    int startoctant = (int)start / 45;
-    int endoctant = (int)end / 45;
-
-    while (x >= y) {
-        /* draw full octants */
-        for (int i = startoctant + 1; i < endoctant; i++) {
-            v2i p1 = shifttooctant(p, (v2i){x, y}, i);
-            drawlinethick(pixels, p, p1, color);
-        }
-
-        /* draw partial octants */
-        v2i sp = shifttooctant(p, (v2i){x, y}, startoctant);
-        if (x < (r * degcos(fmod(start, 45))))
-            drawlinethick(pixels, p, sp, color);
-        v2i ep = shifttooctant(p, (v2i){x, y}, endoctant);
-        if (x > (r * degcos(fmod(end, 45))))
-            drawlinethick(pixels, p, ep, color);
-
-        if (err <= 0) {
-            y++;
-            err += dy;
-            dy += 2;
-        }
-
-        if (err > 0) {
-            x--;
-            dx += 2;
-            err += dx - (r << 1);
-        }
-    }
-}

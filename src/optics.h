@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 
-#define SCREENWIDTH  640
-#define SCREENHEIGHT 480
+#define SCREENWIDTH  1920
+#define SCREENHEIGHT 1080
 
 typedef struct v2_s  { double x, y; } v2;
 typedef struct v2i_s { int x, y; } v2i;
@@ -17,11 +17,29 @@ enum Colors {
     MAGENTA = 0xFF00FF,
 };
 
-void drawpixel(unsigned int *pixels, v2i p, unsigned int color);
+void drawpixelraw(unsigned int *pixels, v2i p, unsigned int color);
+int drawpixel(unsigned int *pixels, v2i p, unsigned int color);
+void clearscreen(unsigned int *pixels, unsigned int color);
 void drawline(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
 void drawlinethick(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
 void fillcircle(unsigned int *pixels, v2i p, int r, unsigned int color);
 void drawcircle(unsigned int *pixels, v2i p, int r, unsigned int color);
 void drawarc(unsigned int *pixels, v2i p, int r, double start, double end, unsigned int color);
 void fillarc(unsigned int *pixels, v2i p, int r, double start, double end, unsigned int color);
+
+typedef enum ComponentType {
+    CONVEX_LENS,
+    CONCAVE_LENS,
+    CONVEX_MIRROR,
+    CONCAVE_MIRROR,
+} ComponentType;
+
+typedef struct Component {
+    ComponentType type;
+    int pos;
+    int size;
+    double angle;
+} Component;
+
+void drawcomponent(unsigned int *pixels, Component c, unsigned int color);
 
