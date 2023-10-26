@@ -1,54 +1,43 @@
 #include "optics.h"
-#include "utils.h"
 
-void drawlens(unsigned int *pixels, Component c, unsigned int color);
-void drawconvexlens(unsigned int *pixels, Component c, unsigned int color);
-void drawconcavelens(unsigned int *pixels, Component c, unsigned int color);
+v2i getimagetip(Components components, int object);
+void drawimage(unsigned int *pixels, Components components, int object);
 
-void drawcomponent(unsigned int *pixels, Component c, unsigned int color) {
-    switch (c.type) {
-        case CONVEX_LENS:
-        case CONCAVE_LENS:
-            drawlens(pixels, c, color);
-            break;
-        default:
-            break;
+void drawimages(unsigned int *pixels, Components components) {
+    int i;
+
+    int distances[components.n];
+    for (i = 0; i < components.n; i++)
+        distances[i] = components.data[i].pos;
+
+    for (i = 0; i < components.n; i++) {
+        if (components.data[i].type == OBJECT)
+            drawimage(pixels, components, i);
     }
 }
 
-void drawlens(unsigned int *pixels, Component c, unsigned int color) {
-    switch (c.type) {
-        case CONVEX_LENS:
-            drawconvexlens(pixels, c, color);
-            break;
-        case CONCAVE_LENS:
-            drawconcavelens(pixels, c, color);
-            break;
-        default:
-            break;
-    }
+void drawimage(unsigned int *pixels, Components components, int object) {
+    v2i tip = getimagetip(components, object);
 }
 
-void drawconvexlens(unsigned int *pixels, Component c, unsigned int color) {
-    double r = (double)c.size / degsin(c.angle);
-    int c1 = c.pos - ((double)c.size / degtan(c.angle));
-    int c2 = c.pos + ((double)c.size / degtan(c.angle));
-    drawarc(pixels, (v2i){c1, SCREENHEIGHT/2}, r, -c.angle, c.angle, color);
-    drawarc(pixels, (v2i){c2, SCREENHEIGHT/2}, r, 180 - c.angle, 180 + c.angle, color);
-}
+v2i getimagetip(Components components, int object) {
+    int n, i, j;
+    n = 0;
+    for (i = 0; i < components.n; i++)
+        if (components.data[i].type != OBJECT)
+            n++;
 
-void drawconcavelens(unsigned int *pixels, Component c, unsigned int color) {
-    double r = (double)c.size / degsin(c.angle);
-    int x = r * degcos(c.angle);
-    int y = sqrt(pow(r, 2) - pow(x + 1, 2));
-    int c1 = c.pos - (2 * r) + x;
-    int c2 = c.pos + (2 * r) - x;
-    drawarc(pixels, (v2i){c1, SCREENHEIGHT/2}, r, -c.angle, c.angle, color);
-    drawarc(pixels, (v2i){c2, SCREENHEIGHT/2}, r, 180 - c.angle, 180 + c.angle, color);
-    v2i p0 = (v2i){c.pos - 2 * (r - x), SCREENHEIGHT/2 + y};
-    v2i p1 = (v2i){c.pos + 2 * (r - x), SCREENHEIGHT/2 + y};
-    drawline(pixels, p0, p1, color);
-    p0.y = p1.y = SCREENHEIGHT/2 - y;
-    drawline(pixels, p0, p1, color);
+    Component *comps = malloc(sizeof(Component) * n);
+    j = 0;
+    for (i = 0; i < components.n; i++)
+        if (components.data[i].type != OBJECT)
+            comps[j++] = components.data[i];
+    sortcomponents(comps, 0, n - 1);
+
+    for (i = 0; i < n; i++)
+        printf("%d ", comps[i].pos);
+    putchar('\n');
+
+    free(comps);
 }
 

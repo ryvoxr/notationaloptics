@@ -1,6 +1,7 @@
-#include "optics.h"
-#include "utils.h"
+#include "graphics.h"
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 void drawlinelow(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
 void drawlinehigh(unsigned int *pixels, v2i p0, v2i p1, unsigned int color);
