@@ -1,0 +1,3 @@
+array.o: array.c /usr/include/stdc-predef.h utils.h
+/usr/include/stdc-predef.h:
+utils.h:
