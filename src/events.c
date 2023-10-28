@@ -25,6 +25,8 @@ void handleevent(State *state, Context *ctx, SDL_Event event) {
         case SDL_MOUSEBUTTONUP:
             state->mousebutton = -1;
             break;
+        case SDL_MOUSEWHEEL:
+            updatefocal(state, event.wheel.y);
     }
 };
 

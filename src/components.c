@@ -7,6 +7,7 @@ void drawobject(unsigned int *pixels, Component c, unsigned int color);
 void drawconvexlens(unsigned int *pixels, Component c, unsigned int color);
 void drawconcavelens(unsigned int *pixels, Component c, unsigned int color);
 void swapcomponents(Component *c1, Component *c2);
+void drawfocal(unsigned int *pixels, Component c, unsigned int color);
 
 Components newcomponents() {
     Components components = (Components) {
@@ -32,6 +33,11 @@ void drawcomponents(State *state) {
         if (state->components.closest == i && state->components.selected == -1)
             color = GREEN;
         drawcomponent(state->pixels, state->components.data[i], color);
+
+        if (state->components.selected == i)
+            drawfocal(state->pixels, state->components.data[i], color);
+        else if ((state->components.closest == i) && (state->components.selected == -1))
+            drawfocal(state->pixels, state->components.data[i], color);
     }
 }
 
@@ -113,6 +119,31 @@ void drawlens(unsigned int *pixels, Component c, unsigned int color) {
             drawconcavelens(pixels, c, color);
             break;
         default:
+            break;
+    }
+}
+
+void drawfocal(unsigned int *pixels, Component c, unsigned int color) {
+    if (c.type == OBJECT)
+        return;
+    fillcircle(pixels, (v2i){c.pos + c.f, MIDY}, SCREENWIDTH/200, color);
+    drawcircle(pixels, (v2i){c.pos - c.f, MIDY}, SCREENWIDTH/200, color);
+}
+
+void updatefocal(State *state, int y) {
+    int off = state->components.selected == -1 ? state->components.closest : state->components.selected;
+    int dy = (SCREENWIDTH/200) * y;
+    Component *c = state->components.data + off;
+    switch (c->type) {
+        case OBJECT:
+            break;
+        case CONVEX_LENS:
+        case CONVEX_MIRROR:
+            c->f = MAX(c->f + dy, 0);
+            break;
+        case CONCAVE_LENS:
+        case CONCAVE_MIRROR:
+            c->f = MIN(c->f + dy, 0);
             break;
     }
 }

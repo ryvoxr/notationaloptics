@@ -17,6 +17,7 @@ typedef struct Component {
     int height;
     double angle;
     int id;
+    int f;
 } Component;
 
 typedef struct Components {
@@ -49,6 +50,7 @@ void drawcomponent(unsigned int *pixels, Component c, unsigned int color);
 void selectcomponent(State *state);
 void updatecomponent(State *state);
 void sortcomponents(Component *cs, int left, int right);
+void updatefocal(State *state, int y);
 
 void drawimages(unsigned int *pixels, Components components);
 

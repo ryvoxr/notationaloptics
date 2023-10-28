@@ -51,6 +51,7 @@ int main() {
         .pos = MIDX,
         .height = 100,
         .angle = 20,
+        .f = 100,
     };
 
     Component concavelens = {
@@ -58,6 +59,7 @@ int main() {
         .pos = MIDX + 200,
         .height = 100,
         .angle = 10,
+        .f = -200,
     };
 
     Component object = {
@@ -65,6 +67,7 @@ int main() {
         .pos = MIDX - 200,
         .height = 50,
         .angle = NAN,
+        .f = NAN,
     };
 
     addcomponent(&state.components, convexlens);
@@ -73,11 +76,13 @@ int main() {
 
     while (1) {
         handleevents(&state, &ctx);
+
         clearscreen(state.pixels, BLACK);
         drawline(state.pixels, (v2i){0, MIDY}, (v2i){SCREENWIDTH, MIDY}, GRAY);
         drawcomponents(&state);
-        SDL_UpdateTexture(ctx.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
+        drawimages(state.pixels, state.components);
 
+        SDL_UpdateTexture(ctx.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
         SDL_RenderClear(ctx.renderer);
         SDL_RenderCopy(ctx.renderer, ctx.texture, NULL, NULL);
         SDL_RenderPresent(ctx.renderer);
