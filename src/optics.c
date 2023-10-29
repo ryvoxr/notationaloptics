@@ -5,6 +5,7 @@ typedef struct Object {
     int pos;
     int d;
     int h;
+    int image;
 } Object;
 
 void drawimage(unsigned int *pixels, Components components, int object);
@@ -33,20 +34,19 @@ void drawimage(unsigned int *pixels, Components components, int objecti) {
             comps[j++] = components.data[i];
     sortcomponents(comps, 0, n - 1);
 
-    printf("n: %d\n", n);
-
-    Object o = { components.data[objecti].pos, NAN, components.data[objecti].height };
+    Object o = { components.data[objecti].pos, NAN, components.data[objecti].height, 0 };
     int lastpos = o.pos;
     for (i = 0; i < n; i++) {
         if (lastpos > comps[i].pos)
             continue;
         lastpos = o.pos;
         calculateimage(&o, comps + i);
-        printf("pos: %d, d: %d, h: %d\n", o.pos, o.d, o.h);
     }
 
-    putchar('\n');
-    drawline(pixels, (v2i){o.pos, MIDY}, (v2i){o.pos, MIDY - o.h}, RED);
+    if (o.image) {
+        unsigned int color = o.d > 0 ? GREEN : RED;
+        drawarrow(pixels, (v2i){o.pos, MIDY - o.h}, color);
+    }
 
     free(comps);
 }
@@ -56,16 +56,14 @@ void calculateimage(Object *o, Component *c) {
     int d_o = c->pos - o->pos;
     int h_o = o->h;
     if (d_o - c->f == 0 || d_o == 0) {
-        o->d = NAN;
-        o->h = NAN;
-        o->pos = NAN;
+        o->image = 0;
         return;
     }
     int d_i = (d_o * c->f) / (d_o - c->f);
-    printf("do: %d\n", d_o);
     int h_i = (-d_i * h_o) / d_o;
     o->pos = c->pos + d_i;
     o->h = h_i;
-    o->d = NAN;
+    o->d = d_i;
+    o->image = 1;
 }
 

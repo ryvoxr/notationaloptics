@@ -51,6 +51,9 @@ void selectcomponent(State *state);
 void updatecomponent(State *state);
 void sortcomponents(Component *cs, int left, int right);
 void updatefocal(State *state, int y);
+void drawarrow(unsigned int *pixels, v2i tip, unsigned int color);
 
 void drawimages(unsigned int *pixels, Components components);
 
+void initfreetype();
+void drawtext(unsigned int *pixels, char *text, v2i pos, unsigned int color, int fontsize);

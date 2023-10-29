@@ -289,3 +289,11 @@ void drawarc(unsigned int *pixels, v2i p, int r, double start, double end, unsig
     }
 }
 
+void drawarrow(unsigned int *pixels, v2i tip, unsigned int color) {
+    drawline(pixels, (v2i){tip.x, MIDY}, tip, color);
+    int dx = (SCREENHEIGHT/75);
+    int dy = tip.y < MIDY ? dx : -dx;
+    drawline(pixels, tip, (v2i){tip.x + dx, tip.y + dy}, color);
+    drawline(pixels, tip, (v2i){tip.x - dx, tip.y + dy}, color);
+}
+

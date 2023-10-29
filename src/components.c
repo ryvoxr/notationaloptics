@@ -1,7 +1,5 @@
 #include "optics.h"
 
-#define TIPSIZE (SCREENHEIGHT / 75)
-
 void drawlens(unsigned int *pixels, Component c, unsigned int color);
 void drawobject(unsigned int *pixels, Component c, unsigned int color);
 void drawconvexlens(unsigned int *pixels, Component c, unsigned int color);
@@ -150,11 +148,7 @@ void updatefocal(State *state, int y) {
 
 void drawobject(unsigned int *pixels, Component c, unsigned int color) {
     v2i tip = (v2i){c.pos, MIDY - c.height};
-    drawline(pixels, (v2i){c.pos, MIDY}, tip, color);
-    int dx = TIPSIZE;
-    int dy = c.height > 0 ? dx : -dx;
-    drawline(pixels, tip, (v2i){tip.x + dx, tip.y + dy}, color);
-    drawline(pixels, tip, (v2i){tip.x - dx, tip.y + dy}, color);
+    drawarrow(pixels, tip, color);
 }
 
 void drawconvexlens(unsigned int *pixels, Component c, unsigned int color) {

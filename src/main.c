@@ -1,11 +1,5 @@
 #include <stdio.h>
 #include "optics.h"
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include "cimgui.h"
-
-#define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
-
-
 
 int main() {
     ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0,
@@ -39,6 +33,8 @@ int main() {
     ASSERT(ctx.texture,
             "Could not create texture: %s\n", SDL_GetError());
 
+    initfreetype();
+
     State state = {
         .pixels = malloc(sizeof(unsigned int) * SCREENWIDTH * SCREENHEIGHT),
         .components = newcomponents(),
@@ -66,8 +62,8 @@ int main() {
         .type = OBJECT,
         .pos = MIDX - 200,
         .height = 50,
-        .angle = NAN,
-        .f = NAN,
+        .angle = 0,
+        .f = 0,
     };
 
     addcomponent(&state.components, convexlens);
@@ -81,6 +77,7 @@ int main() {
         drawline(state.pixels, (v2i){0, MIDY}, (v2i){SCREENWIDTH, MIDY}, GRAY);
         drawcomponents(&state);
         drawimages(state.pixels, state.components);
+        drawtext(state.pixels, "Notational Optics", (v2i){5, 0}, WHITE, 16);
 
         SDL_UpdateTexture(ctx.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
         SDL_RenderClear(ctx.renderer);
@@ -94,6 +91,7 @@ int main() {
 
 void quit(State *state, Context *ctx) {
     free(state->pixels);
+    free(state->components.data);
     SDL_DestroyTexture(ctx->texture);
     SDL_DestroyRenderer(ctx->renderer);
     SDL_DestroyWindow(ctx->window);
