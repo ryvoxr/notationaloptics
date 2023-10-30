@@ -4,6 +4,7 @@
 #define SCREENHEIGHT 1080
 #define MIDX (SCREENWIDTH/2)
 #define MIDY (SCREENHEIGHT/2)
+#define FONTSIZE 16
 
 typedef struct v2_s  { double x, y; } v2;
 typedef struct v2i_s { int x, y; } v2i;

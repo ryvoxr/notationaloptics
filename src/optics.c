@@ -1,6 +1,6 @@
 #include "optics.h"
 
-/* Object represents both optical objects and images */
+/* Object represents both objects and images */
 typedef struct Object {
     int pos;
     int d;
@@ -13,7 +13,6 @@ void calculateimage(Object *o, Component *c);
 
 void drawimages(unsigned int *pixels, Components components) {
     int i;
-
     for (i = 0; i < components.n; i++) {
         if (components.data[i].type == OBJECT)
             drawimage(pixels, components, i);
@@ -34,7 +33,7 @@ void drawimage(unsigned int *pixels, Components components, int objecti) {
             comps[j++] = components.data[i];
     sortcomponents(comps, 0, n - 1);
 
-    Object o = { components.data[objecti].pos, NAN, components.data[objecti].height, 0 };
+    Object o = { components.data[objecti].pos, 0, components.data[objecti].height, 0 };
     int lastpos = o.pos;
     for (i = 0; i < n; i++) {
         if (lastpos > comps[i].pos)
@@ -51,7 +50,7 @@ void drawimage(unsigned int *pixels, Components components, int objecti) {
     free(comps);
 }
 
-/* calculateimage: calculates and fills values for o */
+/* calculateimage: calculates and fills values of resulting image for o */
 void calculateimage(Object *o, Component *c) {
     int d_o = c->pos - o->pos;
     int h_o = o->h;

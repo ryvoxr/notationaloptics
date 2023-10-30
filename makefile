@@ -13,4 +13,6 @@ bin/text.o : src/text.c
 bin/%.o : src/%.c
 	gcc -c $< -o $@ $(CFLAGS)
 
+clean : 
+	rm -f bin/*.o bin/notationaloptics
 

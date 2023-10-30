@@ -44,7 +44,7 @@ int main() {
 
     Component convexlens = {
         .type = CONVEX_LENS,
-        .pos = MIDX,
+        .pos = MIDX - 60,
         .height = 100,
         .angle = 20,
         .f = 100,
@@ -70,6 +70,7 @@ int main() {
     addcomponent(&state.components, concavelens);
     addcomponent(&state.components, object);
 
+
     while (1) {
         handleevents(&state, &ctx);
 
@@ -77,14 +78,15 @@ int main() {
         drawline(state.pixels, (v2i){0, MIDY}, (v2i){SCREENWIDTH, MIDY}, GRAY);
         drawcomponents(&state);
         drawimages(state.pixels, state.components);
-        drawtext(state.pixels, "Notational Optics", (v2i){5, 0}, WHITE, 16);
+        drawtitle(state.pixels);
+
+        drawcomponentinfo(state.pixels, (v2i){5, 0}, activecomponent(&state.components));
 
         SDL_UpdateTexture(ctx.texture, NULL, state.pixels, SCREENWIDTH * sizeof(unsigned int));
         SDL_RenderClear(ctx.renderer);
         SDL_RenderCopy(ctx.renderer, ctx.texture, NULL, NULL);
         SDL_RenderPresent(ctx.renderer);
 
-        drawimages(state.pixels, state.components);
         SDL_Delay(4);
     }
 }

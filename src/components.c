@@ -199,3 +199,71 @@ void swapcomponents(Component *c1, Component *c2) {
     *c2 = temp;
 }
 
+Component *activecomponent(Components *components) {
+    if (components->selected >= 0)
+        return components->data + components->selected;
+    else if (components->closest >= 0)
+        return components->data + components->closest;
+    else
+        return NULL;
+}
+
+void drawcomponentinfo(unsigned int *pixels, v2i pos, Component *c) {
+    if (c == NULL)
+        return;
+
+    int px = pos.x;
+    int py = pos.y;
+    const int spacing = 20;
+    char *str = malloc(sizeof(char) * 100);
+
+    setfontsize(16);
+    setfontcolor(WHITE);
+    setfontalign(LEFT);
+
+    char *type;
+    switch (c->type) {
+        case CONVEX_LENS:
+            type = "Convex Lens";
+            break;
+        case CONCAVE_LENS:
+            type = "Concave Lens";
+            break;
+        case CONVEX_MIRROR:
+            type = "Convex Mirror";
+            break;
+        case CONCAVE_MIRROR:
+            type = "Concave Mirror";
+            break;
+        case OBJECT:
+            type = "Object";
+            break;
+    }
+    drawtext(pixels, type, (v2i){px, py});
+
+    px += spacing;
+
+    sprintf(str, "pos: %d", c->pos);
+    drawtext(pixels, str, (v2i){px, py += spacing});
+
+    switch (c->type) {
+        case CONVEX_LENS:
+        case CONCAVE_LENS:
+        case CONVEX_MIRROR:
+        case CONCAVE_MIRROR:
+            sprintf(str, "f: %d", c->f);
+            drawtext(pixels, str, (v2i){px, py += spacing});
+            break;
+        case OBJECT:
+            sprintf(str, "height: %d", c->height);
+            drawtext(pixels, str, (v2i){px, py += spacing});
+            
+            drawtext(pixels, "Image", (v2i){px - spacing, py += spacing});
+            break;
+    }
+
+
+
+    free(str);
+}
+
